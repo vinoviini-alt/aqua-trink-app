@@ -1,0 +1,21 @@
+{
+  "name": "AQUA – Trink-Erinnerung",
+  "short_name": "AQUA",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#eff7fb",
+  "theme_color": "#087fb8",
+  "description": "Dein persönlicher Wasser-Tracker mit individuellem Tagesziel.",
+  "icons": [
+    {
+      "src": "icons/aqua-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/aqua-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

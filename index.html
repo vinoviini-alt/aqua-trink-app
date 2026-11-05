@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#087fb8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AQUA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/aqua-192.png">
+<title>AQUA – Trink-Erinnerung</title>
+<style>
+:root{--blue:#087fb8;--blue2:#27a6dc;--ink:#163448;--muted:#698394;--bg:#eff7fb;--card:#fff;--line:#e1edf3;--soft:#e6f4fb}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#eaf6fc 0,#f6fafc 48%,#f6fafc 100%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 28px)}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#29b4e7,#087fb8);display:grid;place-items:center;color:white;font-size:23px;box-shadow:0 7px 18px #087fb833}
+.brand strong{letter-spacing:3px;font-size:16px}.brand small{display:block;color:var(--muted);letter-spacing:0;font-size:11px;margin-top:2px}
+.iconbtn{border:1px solid var(--line);background:#fff;width:42px;height:42px;border-radius:14px;font-size:18px;color:var(--ink)}
+.hero{text-align:center;margin:18px 0 20px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--blue);text-transform:uppercase}.hero h1{font-size:27px;margin:7px 0 5px;letter-spacing:-.7px}.hero p{margin:0;color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid #e7f0f5;border-radius:26px;padding:22px;box-shadow:0 12px 35px #1c5d7910}
+.progress-wrap{display:grid;place-items:center;padding:4px 0 12px}.ring{width:218px;height:218px;position:relative;display:grid;place-items:center}.ring svg{position:absolute;inset:0;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:12}.track{stroke:#e7f2f7}.value{stroke:url(#grad);stroke-linecap:round;transition:stroke-dashoffset .35s}
+.ringtext{position:relative;text-align:center}.drop{font-size:23px;color:var(--blue)}.amount{font-size:34px;font-weight:800;letter-spacing:-1px;margin:4px 0}.sub{font-size:13px;color:var(--muted)}
+.remaining{text-align:center;font-weight:650;font-size:14px;margin:0 0 16px}
+.stats{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:15px;color:var(--muted);font-size:13px}.stats b{color:var(--ink)}
+.actions{display:grid;gap:10px;margin:16px 0}.primary{border:0;border-radius:18px;background:linear-gradient(100deg,#0b8fc8,#0875ad);color:white;font-weight:750;font-size:16px;padding:17px 14px;box-shadow:0 9px 18px #087fb82b}.secondary{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:15px;padding:12px;font-size:13px}
+.reminder{display:flex;align-items:flex-start;gap:12px;background:#e8f5fb;border-radius:18px;padding:15px;margin-top:14px}.bell{font-size:20px}.reminder strong{display:block;font-size:13px}.reminder p{font-size:12px;color:var(--muted);margin:4px 0 0;line-height:1.45}
+.glasses{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px;justify-content:center}.glass{width:42px;height:46px;border-radius:13px;background:#eff7fb;border:1px solid #dcecf4;display:grid;place-items:center;font-size:20px}.glass.filled{background:#dff3fc;border-color:#b7e3f5}
+.panel{display:none;position:fixed;inset:0;background:#102d3d66;z-index:5;align-items:flex-end;justify-content:center}.panel.open{display:flex}.sheet{background:#fff;width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:24px 22px calc(env(safe-area-inset-bottom) + 24px);max-height:90vh;overflow:auto}.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.sheet h2{font-size:20px;margin:0}.close{border:0;background:#eff6fa;border-radius:12px;width:36px;height:36px;font-size:18px}
+.field{margin:17px 0}.field label{display:block;font-weight:650;font-size:13px;margin-bottom:8px}.field input,.field select{width:100%;padding:14px;border:1px solid var(--line);border-radius:13px;background:#f9fcfd;font-size:16px;color:var(--ink)}
+.toggleline{display:flex;justify-content:space-between;align-items:center;gap:12px}.hint{font-size:12px;color:var(--muted);line-height:1.5}.save{width:100%;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 22px);transform:translateX(-50%);background:#15394e;color:white;border-radius:14px;padding:12px 17px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1}
+footer{text-align:center;color:#9aafbb;font-size:11px;margin-top:19px}
+@media(min-width:520px){.app{padding-top:28px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+ <div class="brand"><div class="logo">💧</div><div><strong>AQUA</strong><small>DEIN TRINK-BEGLEITER</small></div></div>
+ <button class="iconbtn" id="openSettings" aria-label="Einstellungen">⚙</button>
+</header>
+<section class="hero"><div class="eyebrow" id="weekday">DEIN TAGESFORTSCHRITT</div><h1>Ein Schluck nach dem anderen.</h1><p>Jeder Schluck bringt dich deinem Ziel näher.</p></section>
+<section class="card">
+ <div class="progress-wrap">
+  <div class="ring">
+   <svg viewBox="0 0 220 220" aria-hidden="true"><defs><linearGradient id="grad"><stop stop-color="#31b8e8"/><stop offset="1" stop-color="#0875ad"/></linearGradient></defs><circle class="track" cx="110" cy="110" r="96"/><circle class="value" id="progressCircle" cx="110" cy="110" r="96" stroke-dasharray="603.19" stroke-dashoffset="603.19"/></svg>
+   <div class="ringtext"><div class="drop">💧</div><div class="amount" id="consumed">0 ml</div><div class="sub">von <span id="goalLabel">2.000 ml</span></div></div>
+  </div>
+ </div>
+ <p class="remaining" id="remaining">Noch 2.000 ml bis zu deinem Tagesziel</p>
+ <div class="stats"><span><b id="glassCount">0</b> Gläser getrunken</span><span><b id="glassSizeLabel">200 ml</b> pro Glas</span></div>
+ <div class="glasses" id="glassVisuals" aria-label="Getrunkene Gläser"></div>
+</section>
+<div class="actions">
+ <button class="primary" id="addGlass">＋ &nbsp; Ein Glas Wasser hinzufügen (+200 ml)</button>
+ <button class="secondary" id="undo">↶ &nbsp; Letztes Glas rückgängig machen</button>
+</div>
+<div class="reminder"><div class="bell">🔔</div><div><strong id="reminderTitle">Deine Erinnerungen</strong><p id="reminderText">Stündlich von 07:00 bis 21:00 Uhr. Aktiviere Erinnerungen in den Einstellungen.</p></div></div>
+<footer>Deine Daten bleiben auf diesem Gerät. AQUA ist ein persönlicher Trink-Tracker.</footer>
+</main>
+
+<div class="panel" id="settingsPanel" role="dialog" aria-modal="true" aria-label="Einstellungen">
+ <section class="sheet">
+  <div class="sheethead"><h2>Einstellungen</h2><button class="close" id="closeSettings" aria-label="Schließen">×</button></div>
+  <div class="field"><label for="goalInput">Dein tägliches Trinkziel (ml)</label><input id="goalInput" type="number" min="200" max="10000" step="100" value="2000"></div>
+  <div class="field"><label for="sizeInput">Glasgröße</label><select id="sizeInput"><option value="150">150 ml</option><option value="200" selected>200 ml</option><option value="250">250 ml</option><option value="300">300 ml</option><option value="400">400 ml</option><option value="500">500 ml</option></select></div>
+  <div class="field"><div class="toggleline"><label for="reminderToggle">Stündliche Erinnerung</label><input id="reminderToggle" type="checkbox" style="width:22px;height:22px;accent-color:#087fb8"></div><p class="hint">Erinnerungszeitraum: 07:00–21:00 Uhr. Im ersten Web-App-Stand kann AQUA nur erinnern, solange die App geöffnet ist. Zuverlässige Mitteilungen im Hintergrund benötigen einen Push-Dienst.</p></div>
+  <button class="primary save" id="saveSettings">Einstellungen speichern</button>
+  <p class="hint" style="margin-top:14px">Tipp: Füge AQUA über Safari → Teilen → „Zum Home-Bildschirm“ hinzu, damit sie sich wie eine App öffnen lässt.</p>
+ </section>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = id => document.getElementById(id);
+const KEY = "aqua.web.v1";
+const today = () => new Date().toLocaleDateString("sv-SE");
+let state = JSON.parse(localStorage.getItem(KEY) || "null") || {date:today(),count:0,goal:2000,size:200,reminders:false};
+if(state.date !== today()){state.date=today();state.count=0;persist();}
+let reminderTimer = null;
+let lastReminderHour = -1;
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));}
+function fmt(n){return new Intl.NumberFormat("de-DE").format(n);}
+function render(){
+ const consumed=state.count*state.size, remaining=Math.max(0,state.goal-consumed), progress=Math.min(consumed/state.goal,1);
+ $("consumed").textContent=fmt(consumed)+" ml";
+ $("goalLabel").textContent=fmt(state.goal)+" ml";
+ $("remaining").textContent=remaining===0?"Tagesziel erreicht – stark!":"Noch "+fmt(remaining)+" ml bis zu deinem Tagesziel";
+ $("glassCount").textContent=state.count;
+ $("glassSizeLabel").textContent=state.size+" ml";
+ $("addGlass").innerHTML="＋ &nbsp; Ein Glas Wasser hinzufügen (+"+state.size+" ml)";
+ $("progressCircle").style.strokeDashoffset=603.19*(1-progress);
+ $("weekday").textContent=new Intl.DateTimeFormat("de-DE",{weekday:"long",day:"numeric",month:"long"}).format(new Date()).toUpperCase();
+ $("glassVisuals").innerHTML="";
+ const shown=Math.min(state.count,12);
+ for(let i=0;i<shown;i++){const el=document.createElement("div");el.className="glass filled";el.textContent="🥛";$("glassVisuals").append(el);}
+ if(state.count>12){const more=document.createElement("span");more.className="hint";more.textContent="+"+(state.count-12)+" weitere";$("glassVisuals").append(more);}
+ $("undo").disabled=state.count===0;
+ $("undo").style.opacity=state.count===0?".45":"1";
+ $("reminderTitle").textContent=state.reminders?"Erinnerungen eingeschaltet":"Deine Erinnerungen";
+ $("reminderText").textContent=state.reminders?"Stündliche Erinnerung 07:00–21:00 Uhr, solange AQUA geöffnet ist.":"Stündlich von 07:00 bis 21:00 Uhr. Aktiviere Erinnerungen in den Einstellungen.";
+}
+function toast(message){$("toast").textContent=message;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2300);}
+$("addGlass").addEventListener("click",()=>{state.count++;persist();render();toast("Glas hinzugefügt – "+(state.count*state.size)+" ml insgesamt.");});
+$("undo").addEventListener("click",()=>{if(state.count>0){state.count--;persist();render();toast("Letztes Glas wurde zurückgenommen.");}});
+$("openSettings").onclick=()=>{$("goalInput").value=state.goal;$("sizeInput").value=state.size;$("reminderToggle").checked=state.reminders;$("settingsPanel").classList.add("open");};
+$("closeSettings").onclick=()=>$("settingsPanel").classList.remove("open");
+$("settingsPanel").addEventListener("click",e=>{if(e.target===$("settingsPanel"))$("settingsPanel").classList.remove("open");});
+$("saveSettings").onclick=async()=>{
+ const goal=Number($("goalInput").value), size=Number($("sizeInput").value);
+ if(!Number.isFinite(goal)||goal<200||goal>10000){toast("Bitte ein Tagesziel zwischen 200 und 10.000 ml eingeben.");return;}
+ state.goal=goal;state.size=size;
+ const wants=$("reminderToggle").checked;
+ if(wants && "Notification" in window){
+  if(Notification.permission==="default"){try{await Notification.requestPermission();}catch(e){}}
+  if(Notification.permission==="denied"){state.reminders=false;toast("Mitteilungen sind im Browser blockiert.");}
+  else state.reminders=true;
+ } else if(wants){state.reminders=true;toast("In-App-Erinnerungen aktiviert.");}
+ else state.reminders=false;
+ persist();render();$("settingsPanel").classList.remove("open");setupReminderTimer();toast("Einstellungen gespeichert.");
+};
+function setupReminderTimer(){
+ if(reminderTimer)clearInterval(reminderTimer);
+ if(!state.reminders)return;
+ reminderTimer=setInterval(()=>{
+  const now=new Date(), hour=now.getHours(), minute=now.getMinutes();
+  if(hour>=7&&hour<=21&&minute===0&&lastReminderHour!==hour){
+   lastReminderHour=hour;
+   if(document.visibilityState==="visible"){
+    toast("💧 Zeit für ein Glas Wasser!");
+    if("Notification" in window && Notification.permission==="granted"){
+     try{new Notification("Zeit für ein Glas Wasser 💧",{body:"Trink ein Glas Wasser und aktualisiere deinen AQUA-Fortschritt."});}catch(e){}
+    }
+   }
+  }
+ },15000);
+}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){if(state.date!==today()){state.date=today();state.count=0;persist();render();}lastReminderHour=-1;}});
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+render();setupReminderTimer();
+</script>
+</body>
+</html>
